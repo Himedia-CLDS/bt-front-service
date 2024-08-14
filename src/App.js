@@ -10,7 +10,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 function App() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
   const isUser = isLogin; // isLogin 상태를 isUser로 활용
 
   const handleUpdateLoginStatus = (status) => {

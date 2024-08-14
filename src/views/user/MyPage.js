@@ -1,6 +1,9 @@
 import React from "react";
 
 function MyPage() {
+  
+  const img_url = process.env.REACT_APP_IMG_BASE_URL;
+
   const userInfo = {
     email: "user@example.com",
     username: "user123",
@@ -23,7 +26,7 @@ function MyPage() {
       <div
         style={{
           backgroundColor: "#fff",
-          padding: "50px 20px",
+          padding: "30px 20px",
           borderRadius: "10px",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           width: "90%",
@@ -31,15 +34,17 @@ function MyPage() {
           textAlign: "center",
         }}
       >
-        <h2 style={{ marginBottom: "20px" }}>내 정보</h2>
+        <h2 style={{ marginBottom: "30px" }}>내 정보</h2>
+        <img
+          src={`${img_url}/94b88d3c-8031-7080-500a-1463b7606495_d11a8886-3954-44b9-8f25-839a1cce001e.jpg`}
+          style={{
+            width: "150px",
+            height: "150px",
+            borderRadius: "50%",
+          }}
+        />
         <p>
           <strong>이메일:</strong> {userInfo.email}
-        </p>
-        <p>
-          <strong>아이디:</strong> {userInfo.username}
-        </p>
-        <p>
-          <strong>성별:</strong> {userInfo.gender}
         </p>
       </div>
     </div>

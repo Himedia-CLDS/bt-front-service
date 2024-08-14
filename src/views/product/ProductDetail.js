@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 
 function ProductDetail() {
+  const img_url = process.env.REACT_APP_IMG_BASE_URL;
   const usageRef = useRef(null);
   const ratingRef = useRef(null);
   const notesRef = useRef(null);
@@ -20,8 +21,7 @@ function ProductDetail() {
     >
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
         <img
-          src="/path/to/product/image.png"
-          alt="BlueLemon"
+          src={`${img_url}/img_name`}
           style={{ width: "150px", height: "150px", borderRadius: "10px" }}
         />
         <div

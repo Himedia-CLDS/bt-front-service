@@ -7,6 +7,12 @@ npm install react-router-dom
 npm start
 ```
 
+### .env작성
+```
+REACT_APP_IMG_BASE_URL = ...
+REACT_APP_API_BASE_URL = ...
+```
+
 ### URL
 | URL                                              | 설명             |
 |--------------------------------------------------------|----------------|

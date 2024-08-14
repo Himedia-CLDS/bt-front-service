@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Feed({ isUser }) {
+  const img_url = process.env.REACT_APP_IMG_BASE_URL;
+
   const [selectedFeed, setSelectedFeed] = useState("전체피드");
 
   const handleSelectChange = (event) => {
@@ -20,6 +22,25 @@ function Feed({ isUser }) {
       image: "",
       description: "첫 번째 게시물 내용.",
       likes: 120,
+      isLiked: false, // 내가 좋아요를 누른 게시물
+      createdAt: "2024-08-14", // 작성일 추가
+    },
+    {
+      id: 1,
+      email: "user1@example.com",
+      image: "",
+      description: "첫 번째 게시물 내용.",
+      likes: 120,
+      isLiked: true, // 내가 좋아요를 누른 게시물
+      createdAt: "2024-08-14", // 작성일 추가
+    },
+    {
+      id: 1,
+      email: "user1@example.com",
+      image: "",
+      description: "첫 번째 게시물 내용.",
+      likes: 120,
+      isLiked: true, // 내가 좋아요를 누른 게시물
       createdAt: "2024-08-14", // 작성일 추가
     },
     {
@@ -28,6 +49,7 @@ function Feed({ isUser }) {
       image: "/path/to/image2.png",
       description: "두 번째 게시물 내용.",
       likes: 95,
+      isLiked: false, // 내가 좋아요를 누르지 않은 게시물
       createdAt: "2024-08-13", // 작성일 추가
     },
     {
@@ -36,6 +58,7 @@ function Feed({ isUser }) {
       image: "/path/to/image3.png",
       description: "세 번째 게시물 내용.",
       likes: 78,
+      isLiked: false, // 내가 좋아요를 누르지 않은 게시물
       createdAt: "2024-08-12", // 작성일 추가
     },
     // 추가적인 게시물 데이터
@@ -103,7 +126,7 @@ function Feed({ isUser }) {
             style={{ padding: "10px", display: "flex", alignItems: "center" }}
           >
             <img
-              src={require("../../assets/images/sinchan.png")}
+              src={`${img_url}/94b88d3c-8031-7080-500a-1463b7606495_d11a8886-3954-44b9-8f25-839a1cce001e.jpg`}
               style={{
                 width: "50px",
                 height: "50px",
@@ -129,7 +152,7 @@ function Feed({ isUser }) {
             </div>
           </div>
           <img
-            src={require("../../assets/images/sinchan.png")}
+            src={`${img_url}/94b88d3c-8031-7080-500a-1463b7606495_d11a8886-3954-44b9-8f25-839a1cce001e.jpg`}
             style={{
               width: "95%",
               height: "auto",
@@ -155,12 +178,11 @@ function Feed({ isUser }) {
                 style={{
                   backgroundColor: "transparent",
                   border: "none",
-                  color: "#B0C4DE",
                   cursor: "pointer",
                   fontSize: "30px",
                 }}
               >
-                🤍🩵
+                {isUser && post.isLiked ? "🩵" : "🤍"}
               </button>
             </div>
           </div>

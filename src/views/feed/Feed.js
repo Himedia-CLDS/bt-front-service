@@ -113,6 +113,7 @@ function Feed({ isLogin, authUser }) {
 
 
   return (
+   
     <div
       style={{
         padding: "10px",

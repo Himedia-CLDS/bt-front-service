@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const DOMAIN = 'http://localhost:8080';
+const DOMAIN = process.env.REACT_APP_PRODUCT_BASE_URL;
+
+console.log(DOMAIN);
 
 export const request = async (method, url, data) => {
     try {

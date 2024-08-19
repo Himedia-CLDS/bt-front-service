@@ -1,12 +1,42 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { request } from "../../api/FeedAPIs";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { request } from "../../apis/FeedAPIs";
 
-function CreateFeed({authUser}) {
+function UpdateFeed({ authUser }) {
   const navigate = useNavigate();
+  const { feedId } = useParams();
   const [preview, setPreview] = useState(null);
   const [content, setContent] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+
+  const fetchFeedData = async () => {
+    try {
+      const feedDTO = {
+        id: feedId,
+        userId: authUser.userId,
+      };
+      const response = await request("PUT", `v1/feed/getfeed`, feedDTO);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setContent(data.apiData.content);
+        setPreview(
+          data.apiData.reImgName
+            ? `${process.env.REACT_APP_IMG_BASE_URL}${data.apiData.reImgName}`
+            : null
+        );
+      } else {
+        console.error("Failed to fetch feed data");
+      }
+    } catch (error) {
+      console.error("서버 오류:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFeedData();
+  }, [feedId]);
 
   const handleCancel = () => {
     navigate(-1);
@@ -18,46 +48,48 @@ function CreateFeed({authUser}) {
       return;
     }
 
-    console.log(authUser.userId);
-    const feedDTO = {
-      userId: authUser.userId,
-      content: content,
-    }
-
-    const formData = new FormData();
-    formData.append(
-      "feedDTO",
-      new Blob([JSON.stringify(feedDTO)], { type: "application/json" })
-    );
-    if (selectedFile) {
-      formData.append("file", selectedFile);
-    }
-
     try {
-      const response = await request("POST", "v1/feed/insert", formData);
+      const feedDTO = {
+        id: feedId,
+        userId: authUser.userId,
+        content: content,
+      };
 
+      const formData = new FormData();
+      formData.append(
+        "feedDTO",
+        new Blob([JSON.stringify(feedDTO)], { type: "application/json" })
+      );
+
+      if (selectedFile) {
+        formData.append("selectedFile", selectedFile);
+      }
+
+      const response = await request("POST", `v1/feed/update`, formData);
+
+      console.log(response);
       if (response.ok) {
-        console.log("피드 작성 완료");
+        console.log("피드 수정 완료");
         navigate("/feed");
       } else {
-        console.error("피드 작성 실패");
-        // 에러 처리 로직 추가
+        console.error("피드 수정 실패");
       }
     } catch (error) {
       console.error("서버 오류:", error);
-      // 에러 처리 로직 추가
     }
   };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
+    console.log("Selected file:", file);
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result);
       };
       reader.readAsDataURL(file);
-      setSelectedFile(file); // 선택한 파일을 상태에 저장
+      setSelectedFile(file);
     }
   };
 
@@ -95,9 +127,8 @@ function CreateFeed({authUser}) {
           position: "relative",
         }}
       >
-        <h2 style={{ marginBottom: "20px" }}>피드 작성</h2>
+        <h2 style={{ marginBottom: "20px" }}>피드 수정</h2>
         <textarea
-          placeholder="내용을 입력하세요..."
           value={content}
           onChange={handleContentChange}
           style={{
@@ -183,7 +214,7 @@ function CreateFeed({authUser}) {
                 border: "1px solid #ccc",
                 borderRadius: "5px",
                 cursor: "pointer",
-                marginRight: "auto"
+                marginRight: "auto",
               }}
             >
               파일 삭제
@@ -213,7 +244,7 @@ function CreateFeed({authUser}) {
               cursor: "pointer",
             }}
           >
-            작성
+            수정
           </button>
         </div>
       </div>
@@ -221,4 +252,4 @@ function CreateFeed({authUser}) {
   );
 }
 
-export default CreateFeed;
+export default UpdateFeed;

@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import LoginSignin from "./views/user/LoginSignin";
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import MyPage from "./views/user/MyPage";
 import Main from "./views/product/Main";
 import ProductDetail from "./views/product/ProductDetail";
@@ -8,53 +7,94 @@ import Feed from "./views/feed/Feed";
 import CreateFeed from "./views/feed/CreateFeed";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { AuthProvider, useAuth } from "./AuthContext";
 
-function App() {
-  const [isLogin, setIsLogin] = useState(true);
-  const isUser = isLogin; // isLogin 상태를 isUser로 활용
+const PrivateRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 
-  const handleUpdateLoginStatus = (status) => {
-    setIsLogin(status);
-  };
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  
+  return isAuthenticated ? <Navigate to="/" replace /> : children;
+};
+
+function AppContent() {
+  const { isAuthenticated, logout, isLoading, checkUser } = useAuth();
+
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Router>
-      <div
-        style={{
-          backgroundColor: "#FFFFFF",
-          textAlign: "center",
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        {/* isUser와 handleUpdateLoginStatus를 Header와 Footer에 전달 */}
-        <Header isUser={isUser} onUpdateLoginStatus={handleUpdateLoginStatus} />
-        <div
-          style={{
-            maxWidth: "600px",
-            width: "100%",
-            margin: "0px auto",
-            flexGrow: 1,
-            paddingTop: "100px",
-            paddingBottom: "50px",
-          }}
-        >
+      <div style={{
+        backgroundColor: "#FFFFFF",
+        textAlign: "center",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}>
+        <Header isUser={isAuthenticated} onUpdateLoginStatus={logout} />
+        <div style={{
+          maxWidth: "600px",
+          width: "100%",
+          margin: "0px auto",
+          flexGrow: 1,
+          paddingTop: "100px",
+          paddingBottom: "50px",
+        }}>
           <Routes>
             <Route path="/" element={<Main />} />
-            <Route
-              path="/loginsingup/:type"
-              element={<LoginSignin isLogin={isLogin} />}
-            />
-            <Route path="/mypage" element={<MyPage />} />
-            <Route path="/product" element={<ProductDetail />} />
-            <Route path="/feed" element={<Feed isUser={isUser} />} />
-            <Route path="/create" element={<CreateFeed />} />
+            <Route path="/login" element={
+              <PublicRoute>
+                {/* Add your login component here */}
+              </PublicRoute>
+            } />
+            <Route path="/signup" element={
+              <PublicRoute>
+                {/* Add your signup component here */}
+              </PublicRoute>
+            } />
+            <Route path="/mypage" element={
+              <PrivateRoute>
+                <MyPage />
+              </PrivateRoute>
+            } />
+            <Route path="/product/:product_id" element={<ProductDetail />} />
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/create" element={
+              <PrivateRoute>
+                <CreateFeed />
+              </PrivateRoute>
+            } />
           </Routes>
         </div>
-        <Footer isUser={isUser} />
+        <Footer isUser={isAuthenticated} />
       </div>
     </Router>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

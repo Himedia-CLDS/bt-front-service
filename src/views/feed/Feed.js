@@ -1,45 +1,116 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { request } from "../../api/FeedAPIs";
+import FeedModal from "../../components/FeedModal";
 
-function Feed({ isUser }) {
-  const [selectedFeed, setSelectedFeed] = useState("전체피드");
+function Feed({ isLogin, authUser }) {
+  const img_url = process.env.REACT_APP_IMG_BASE_URL;
+  const [selectedFeed, setSelectedFeed] = useState("all");
+  const [feeds, setFeeds] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [feedToDelete, setFeedToDelete] = useState(null);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        let response;
+        if (selectedFeed === "all") {
+          response = await request("GET", "v1/feed");
+        } else if (selectedFeed === "my") {
+          response = await request("GET", `v1/feed?userId=${authUser?.userId}`);
+        } else if (selectedFeed === "like") {
+          response = await request(
+            "GET",
+            `v1/feed/like?userId=${authUser?.userId}`
+          );
+        }
+        const data = await response.json();
+        setFeeds(data.apiData);
+      } catch (error) {
+        console.error("Failed to fetch posts", error);
+      }
+    };
+
+    fetchPosts();
+  }, [selectedFeed, authUser?.userId]);
 
   const handleSelectChange = (event) => {
     setSelectedFeed(event.target.value);
   };
 
-  const navigate = useNavigate();
   const handleButtonClick = () => {
     navigate("/create");
   };
 
-  const posts = [
-    {
-      id: 1,
-      email: "user1@example.com",
-      image: "",
-      description: "첫 번째 게시물 내용.",
-      likes: 120,
-      createdAt: "2024-08-14", // 작성일 추가
-    },
-    {
-      id: 2,
-      email: "user2@example.com",
-      image: "/path/to/image2.png",
-      description: "두 번째 게시물 내용.",
-      likes: 95,
-      createdAt: "2024-08-13", // 작성일 추가
-    },
-    {
-      id: 3,
-      email: "user3@example.com",
-      image: "/path/to/image3.png",
-      description: "세 번째 게시물 내용.",
-      likes: 78,
-      createdAt: "2024-08-12", // 작성일 추가
-    },
-    // 추가적인 게시물 데이터
-  ];
+  const toggleLike = async (feedId, isLiked) => {
+    try {
+      let feedLike = {
+        feedId: feedId,
+        userId: authUser?.userId,
+        isLiked: isLiked,
+      };
+      const response = await request("PUT", `v1/feed/like`, feedLike);
+      const changeLike = await response.json();
+      console.log(changeLike);
+
+      setFeeds((prevFeeds) =>
+        prevFeeds.map((feed) =>
+          feed.id === feedId
+            ? {
+                ...feed,
+                liked: !feed.liked,
+                likes: feed.liked ? feed.likes - 1 : feed.likes + 1,
+              }
+            : feed
+        )
+      );
+    } catch (error) {
+      console.error("Failed to toggle like", error);
+    }
+  };
+
+  const handleEditClick = (feedId) => {
+    navigate(`/update/${feedId}`);
+  };
+
+  const handleDeleteClick = (feedId) => {
+    setFeedToDelete(feedId);
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (feedToDelete) {
+      try {
+
+        const feedDTO = {
+          id: feedToDelete,
+          reImgName: feeds?.find((feed) => feed?.id === feedToDelete)?.reImgName,
+          userId: authUser?.userId,
+        };
+
+        console.log(feedDTO)
+
+        const response = await request("PUT", `v1/feed/delete`, feedDTO);
+
+        if (response.ok) {
+          setFeeds((prevFeeds) =>
+            prevFeeds.filter((feed) => feed?.id !== feedToDelete)
+          );
+          console.log("Feed marked as deleted successfully");
+        } else {
+          console.error("Failed to mark feed as deleted");
+        }
+      } catch (error) {
+        console.error("Error marking feed as deleted", error);
+      } finally {
+        setIsModalOpen(false);
+        setFeedToDelete(null);
+      }
+    }
+  };
+
 
   return (
     <div
@@ -47,33 +118,34 @@ function Feed({ isUser }) {
         padding: "10px",
         maxWidth: "600px",
         margin: "0 auto",
+        textAlign: "center",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between", // 요소들을 좌우로 정렬
-          alignItems: "center",
-          marginBottom: "10px",
-        }}
-      >
-        <select
-          value={selectedFeed}
-          onChange={handleSelectChange}
+      {isLogin && (
+        <div
           style={{
-            width: "120px",
-            padding: "5px",
-            borderRadius: "5px",
-            border: "1px solid #ccc",
-            backgroundColor: "#f8f8f8",
-            cursor: "pointer",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "10px",
           }}
         >
-          <option value="전체피드">전체피드</option>
-          <option value="내피드">내피드</option>
-          <option value="좋아요한피드">좋아요</option>
-        </select>
-        {isUser && (
+          <select
+            value={selectedFeed}
+            onChange={handleSelectChange}
+            style={{
+              width: "120px",
+              padding: "5px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              backgroundColor: "#f8f8f8",
+              cursor: "pointer",
+            }}
+          >
+            <option value="all">전체피드</option>
+            <option value="my">내피드</option>
+            <option value="like">좋아요</option>
+          </select>
           <button
             onClick={handleButtonClick}
             style={{
@@ -87,85 +159,138 @@ function Feed({ isUser }) {
           >
             피드작성
           </button>
-        )}
-      </div>
-      {posts.map((post) => (
-        <div
-          key={post.id}
-          style={{
-            border: "1px solid #ccc",
-            borderRadius: "10px",
-            marginBottom: "20px",
-            backgroundColor: "#fff",
-          }}
-        >
-          <div
-            style={{ padding: "10px", display: "flex", alignItems: "center" }}
-          >
-            <img
-              src={require("../../assets/images/sinchan.png")}
-              style={{
-                width: "50px",
-                height: "50px",
-                borderRadius: "50%",
-                marginRight: "10px",
-                border: "1px solid #000",
-              }}
-            />
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <p style={{ fontWeight: "bold", color: "#000", margin: 0 }}>
-                {post.email}
-              </p>
-              <p
-                style={{
-                  color: "#666",
-                  margin: 0,
-                  fontSize: "12px",
-                  textAlign: "left",
-                }}
-              >
-                {post.createdAt}
-              </p>
-            </div>
-          </div>
-          <img
-            src={require("../../assets/images/sinchan.png")}
-            style={{
-              width: "95%",
-              height: "auto",
-              border: "1px solid #000",
-              borderRadius: "0 0 10px 10px",
-            }}
-          />
-          <div style={{ padding: "10px" }}>
-            <p style={{ fontSize: "14px", color: "#333" }}>
-              {post.description}
-            </p>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <span style={{ fontWeight: "bold", color: "#000" }}>
-                {post.likes} likes
-              </span>
-              <button
-                style={{
-                  backgroundColor: "transparent",
-                  border: "none",
-                  color: "#B0C4DE",
-                  cursor: "pointer",
-                  fontSize: "30px",
-                }}
-              >
-                🤍🩵
-              </button>
-            </div>
-          </div>
         </div>
-      ))}
+      )}
+
+      {feeds === null || feeds?.length === 0 ? (
+        <div style={{ marginTop: "20px" }}>피드가 없습니다</div>
+      ) : (
+        feeds?.map((feed) => (
+          <div
+            key={feed?.id}
+            style={{
+              border: "1px solid #ccc",
+              borderRadius: "10px",
+              marginBottom: "20px",
+              backgroundColor: "#fff",
+            }}
+          >
+            <div
+              style={{ padding: "10px", display: "flex", alignItems: "center" }}
+            >
+              <img
+                src={require("../../assets/images/sinchan.png")}
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "50%",
+                  marginRight: "10px",
+                }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flexGrow: 1,
+                }}
+              >
+                <p style={{ color: "#000", margin: 0, textAlign: "left" }}>
+                  {feed?.userEmail}
+                </p>
+                <p
+                  style={{
+                    color: "#666",
+                    margin: 0,
+                    fontSize: "12px",
+                    textAlign: "left",
+                  }}
+                >
+                  {feed?.createdAt}
+                </p>
+              </div>
+              {feed?.userId === authUser?.userId && (
+                <div style={{ display: "flex", gap: "5px" }}>
+                  <button
+                    onClick={() => handleEditClick(feed.id)}
+                    style={{
+                      backgroundColor: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "12px",
+                      color: "#333",
+                    }}
+                  >
+                    수정
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(feed.id)}
+                    style={{
+                      backgroundColor: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "12px",
+                      color: "red",
+                    }}
+                  >
+                    삭제
+                  </button>
+                </div>
+              )}
+            </div>
+            {feed.reImgName ? (
+              <img
+                src={`${img_url}${feed.reImgName}`}
+                style={{
+                  width: "95%",
+                  height: "auto",
+                  borderRadius: "10px",
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: "95%",
+                  height: "auto",
+                  borderRadius: "0 0 10px 10px",
+                  backgroundColor: "#f0f0f0",
+                  margin: "10px auto",
+                }}
+              />
+            )}
+            <div style={{ padding: "10px" }}>
+              <p style={{ fontSize: "14px", color: "#333" }}>{feed.content}</p>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <span style={{ fontWeight: "bold", color: "#000" }}>
+                  {feed.likeCount} likes
+                </span>
+                <button
+                  onClick={() => toggleLike(feed.id, feed.liked)}
+                  style={{
+                    backgroundColor: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "30px",
+                  }}
+                >
+                  {isLogin && feed.liked ? "🩵" : "🤍"}
+                </button>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+
+      <FeedModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

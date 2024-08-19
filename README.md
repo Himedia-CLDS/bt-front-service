@@ -1,3 +1,12 @@
+### BottleTalk Front
+보틀톡프로젝트 프론트서비스
+
+### .env파일 생성
+```
+REACT_APP_IMG_BASE_URL = http://
+REACT_APP_API_BASE_URL = http://
+```
+
 ### 라이브러리
 ```
 npm install react-router-dom

@@ -72,7 +72,7 @@ function Header() {
           </span>
         )}
       </div>
-      {/* <div
+      <div
         style={{
           backgroundColor: "#B0C4DE",
           height: "55px",
@@ -84,12 +84,12 @@ function Header() {
           boxSizing: "border-box",
         }}
       >
-        <div style={{ fontSize: "20px", fontWeight: "bold", color: "#fff" }}>
+        <div style={{ fontSize: "22px", fontWeight: "bold", color: "#fff" }}>
           <Link
             to="/"
             style={{ color: "#fff", textDecoration: "none" }}
           >
-            Bottle Talk
+            BottleTalk Main
           </Link>
         </div>
         <div
@@ -99,7 +99,7 @@ function Header() {
             position: "relative",
           }}
         >
-          <input
+          {/* <input
             type="text"
             placeholder="검색"
             style={{
@@ -122,9 +122,9 @@ function Header() {
             }}
           >
             🔍
-          </button>
+          </button> */}
         </div>
-      </div> */}
+      </div>
     </header>
   );
 }

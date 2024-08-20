@@ -27,7 +27,7 @@ function MyPage() {
           marginTop: "-70px"
         }}
       >
-        <div style={{ fontSize: "20px", fontWeight: "bold", color: "#fff" }}>
+        {/* <div style={{ fontSize: "20px", fontWeight: "bold", color: "#fff" }}>
           <Link
             to="/"
             style={{ color: "#fff", textDecoration: "none" }}
@@ -42,8 +42,7 @@ function MyPage() {
             position: "relative",
           }}
         >
-          
-        </div>
+        </div> */}
       </div> 
     <div
       style={{

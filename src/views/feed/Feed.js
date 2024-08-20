@@ -114,7 +114,7 @@ function Feed({ isLogin, authUser }) {
 
   return (
     <>
-    <div
+    {/* <div
     style={{
       backgroundColor: "#B0C4DE",
       height: "70px",
@@ -138,7 +138,7 @@ function Feed({ isLogin, authUser }) {
     
      
     </div>
-  </div>
+  </div> */}
    
     <div
       style={{

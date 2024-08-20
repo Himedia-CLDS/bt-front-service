@@ -29,6 +29,7 @@ function Main() {
   const onChangeHandler = (e) => {
     const { value } = e.target;
     setSearch(value);
+    searchProducts(value);
   };
 
   const searchProducts = async (search) => {

@@ -32,7 +32,7 @@ function MyPage() {
             to="/"
             style={{ color: "#fff", textDecoration: "none" }}
           >
-            Bottle Talk
+             HOME
           </Link>
         </div>
         <div
@@ -75,9 +75,7 @@ function MyPage() {
         <p>
           <strong>이메일:</strong> {user.attributes.email}
         </p>
-        <p>
-          <strong>ID:</strong> {user.userId}
-        </p>
+        
         {user?.attributes?.picture && (
           <img 
             src={user?.attributes?.picture} 

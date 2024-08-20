@@ -5,6 +5,7 @@
 ```
 REACT_APP_IMG_BASE_URL = http://
 REACT_APP_API_BASE_URL = http://
+REACT_APP_
 ```
 
 ### 라이브러리

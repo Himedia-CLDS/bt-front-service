@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { request } from "../../api/FeedAPIs";
 import FeedModal from "../../components/FeedModal";
 
@@ -113,6 +113,32 @@ function Feed({ isLogin, authUser }) {
 
 
   return (
+    <>
+    <div
+    style={{
+      backgroundColor: "#B0C4DE",
+      height: "70px",
+      width: "100%",
+      padding: "10px",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      borderRadius: "10px",
+      boxSizing: "border-box",
+      position: "relative",
+      marginTop: "-70px",
+    }}
+  >
+    <div style={{ fontSize: "20px", fontWeight: "bold", color: "#fff" }}>
+      <Link to="/" style={{ color: "#fff", textDecoration: "none" }}>
+         HOME
+      </Link>
+    </div>
+    <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
+    
+     
+    </div>
+  </div>
    
     <div
       style={{
@@ -293,6 +319,7 @@ function Feed({ isLogin, authUser }) {
         onConfirm={handleConfirmDelete}
       />
     </div>
+    </>
   );
 }
 

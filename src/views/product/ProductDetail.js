@@ -47,7 +47,7 @@ function ProductDetail() {
             to="/"
             style={{ color: "#fff", textDecoration: "none" }}
           >
-            Bottle Talk
+             HOME
           </Link>
         </div>
         <div
@@ -65,7 +65,7 @@ function ProductDetail() {
       <h1 className="product-name">{product?.kor_name}</h1>
       <img src={product?.img} alt={product?.kor_name} className="product-image" />
       <div className="product-info">
-        <p>영문 이름: {product?.eng_name}</p>
+        <p>{product?.eng_name}</p>
         <p>가격: {product?.price.toLocaleString()} 원</p>
         <p>카테고리: {product?.category}</p>
         <p>국가: {product?.country}</p>

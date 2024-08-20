@@ -13,8 +13,8 @@ Amplify.configure({
         oauth: {
           domain: 'bottletalk-google.auth.ap-northeast-2.amazoncognito.com',
           scopes: ['email', 'profile', 'openid', 'aws.cognito.signin.user.admin'],
-          redirectSignIn: ['http://localhost:3000'],
-          redirectSignOut: ['http://localhost:3000'],
+          redirectSignIn: ['http://43.203.120.58:3000'],
+          redirectSignOut: ['http://43.203.120.58:3000'],
           responseType: 'code'
         }
       }
